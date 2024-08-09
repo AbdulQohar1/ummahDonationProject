@@ -1,5 +1,5 @@
 // src/users/entities/user.entity.ts
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
 
 @Entity()
 export class User {
@@ -14,5 +14,8 @@ export class User {
 
   @Column({ default: false })
   isSuperAdmin: boolean;
+
+  @CreateDateColumn()
+  createdAt: Date;
 }
 // export class User {}
