@@ -21,7 +21,7 @@ export class UsersService {
   }
   
   findOne(id: number): Promise<User | null> {
-    return this.usersRepository.findOneBy({ id: id.toString() });
+    return this.usersRepository.findOneBy({ id });
   };
 
    update(id: number, updateUserDto: UpdateUserDto) {

@@ -4,7 +4,10 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeor
 @Entity()
 export class User {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id: number;
+
+  @Column()
+  name: string;
 
   @Column({ unique: true })
   email: string;
