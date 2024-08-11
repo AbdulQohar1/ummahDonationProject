@@ -4,7 +4,7 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeor
 @Entity()
 export class User {
   @PrimaryGeneratedColumn('uuid')
-  id: number;
+  id: string;
 
   @Column()
   name: string;
@@ -20,5 +20,5 @@ export class User {
 
   @CreateDateColumn()
   createdAt: Date;
-}
-// export class User {}
+};
+

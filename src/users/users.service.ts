@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
@@ -12,30 +12,42 @@ export class UsersService {
     private usersRepository: Repository<User>,
   ) {}
 
-  create(createUserDto: CreateUserDto) {
-      return 'This action adds a new user';
-    }
-  
   findAll(): Promise<User[]> {
     return this.usersRepository.find();
-  }
+  };
   
-  findOne(id: number): Promise<User | null> {
-    return this.usersRepository.findOneBy({ id });
+  async createUser(createUserDto: CreateUserDto): Promise<User> {
+    const user = this.usersRepository.create(createUserDto); // Use 'usersRepository' here
+    return this.usersRepository.save(user); // And here
+  }
+
+  findOne(id: string): Promise<User | null> {
+    return this.usersRepository.findOneBy({ id  });
   };
 
-   update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+    const user = await this.usersRepository.findOne({ where: { id } });
+
+    // Throw exception error if User with the provided id isn't found 
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+
+     // Update the user with new data
+     Object.assign(user, updateUserDto);
+
+     // Save the updated user back to the db
+    return this.usersRepository.save(user);
   };
   
-  async remove(id: number): Promise<void> {
+  async delete(id: string): Promise<void> {
+    const result = await this.usersRepository.delete(id);
+    
+    if (result.affected === 0) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+
     await this.usersRepository.delete(id);
+     `User with the ${id} deleted!`;
   }
-
-  // create(createUserDto: CreateUserDto) {
-  //   return 'This action adds a new user';
-  // }
-  // update(id: number, updateUserDto: UpdateUserDto) {
-  //   return `This action updates a #${id} user`;
-  // }
-}
+};
