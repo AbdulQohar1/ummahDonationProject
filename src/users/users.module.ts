@@ -9,6 +9,5 @@ import { User } from './entities/user.entity';
   exports: [TypeOrmModule, UsersService],
   controllers: [UsersController],
   providers: [UsersService],
-  // exports: [UsersService],
 })
 export class UsersModule {}
