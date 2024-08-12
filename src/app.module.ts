@@ -29,13 +29,11 @@ import { UsersModule } from './users/users.module';
         database: configService.get('DB_NAME'),
         entities: [User],
         // entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: true, 
+        // synchronize: true, 
         // set to false in production
       }),
       inject: [ConfigService],
     }),
-    // AuthModule,
-    // other imports...
   ],
 })
 export class AppModule {}

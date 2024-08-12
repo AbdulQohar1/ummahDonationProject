@@ -12,21 +12,26 @@ export class UsersService {
     private usersRepository: Repository<User>,
   ) {}
 
+  // get all user
   findAll(): Promise<User[]> {
     return this.usersRepository.find();
   };
   
+  // create a new user 
   async createUser(createUserDto: CreateUserDto): Promise<User> {
-    const user = this.usersRepository.create(createUserDto); // Use 'usersRepository' here
-    return this.usersRepository.save(user); // And here
+    const user = this.usersRepository.create(createUserDto);
+
+    return this.usersRepository.save(user);
   }
 
+  // find a user by ID
   findOne(id: string): Promise<User | null> {
     return this.usersRepository.findOneBy({ id  });
   };
 
+  // update user with the id
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
-    const user = await this.usersRepository.findOne({ where: { id } });
+    const user = await this.findOne(id);
 
     // Throw exception error if User with the provided id isn't found 
     if (!user) {
@@ -40,6 +45,7 @@ export class UsersService {
     return this.usersRepository.save(user);
   };
   
+  // delete a user by id
   async delete(id: string): Promise<void> {
     const result = await this.usersRepository.delete(id);
     
@@ -47,7 +53,12 @@ export class UsersService {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
 
-    await this.usersRepository.delete(id);
-     `User with the ${id} deleted!`;
+    // await this.usersRepository.delete(id);
+    //  `User with the ${id} deleted!`;
+  };
+
+  // find a user with the email for  authentication
+  async findByEmail(email: string): Promise<User | undefined> {
+    return this.usersRepository.findOne({ where: {email}})
   }
 };
