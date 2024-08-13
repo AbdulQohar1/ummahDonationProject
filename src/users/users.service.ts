@@ -1,4 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { 
+  Injectable, 
+  NotFoundException, 
+  UnauthorizedException, 
+  InternalServerErrorException 
+} from '@nestjs/common';
+import * as bcrypt from 'bcryptjs'; 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
@@ -15,18 +21,56 @@ export class UsersService {
   // get all user
   findAll(): Promise<User[]> {
     return this.usersRepository.find();
-  };
+  }
   
   // create a new user 
   async createUser(createUserDto: CreateUserDto): Promise<User> {
-    const user = this.usersRepository.create(createUserDto);
+    // Hash the user's password using bcryptjs
+    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
 
+    // Create the new user with the hashed password
+    const user = this.usersRepository.create({
+      ...createUserDto, 
+      password: hashedPassword
+    });
+
+    // Save the new user to the database
     return this.usersRepository.save(user);
-  }
+  };
 
   // find a user by ID
-  findOne(id: string): Promise<User | null> {
-    return this.usersRepository.findOneBy({ id  });
+  async findOne(id: string): Promise<User> {
+    const user = await this.usersRepository.findOneBy({ id });
+
+  if (!user) {
+    throw new NotFoundException(`User with ID ${id} not found`);
+  }
+
+  return user;
+    // try {
+    //   const user = await this.usersRepository.findOneBy({ id });
+  
+    //   if (!user) {
+    //     throw new NotFoundException(`User with ID ${id} not found`);
+    //   }
+  
+    //   return user;
+    // } catch (error) {
+    //   if (error instanceof NotFoundException) {
+    //     throw error;
+    //   }
+    //   console.error('Error finding user:', error);
+    //   throw new InternalServerErrorException('An error occurred while trying to find the user');
+    // }     
+
+  
+    // const user = this.usersRepository.findOneBy({ id });
+
+    // if (!user) {
+    //   throw new NotFoundException(`User with ID ${id} not found`);
+    // }
+
+    // return user;
   };
 
   // update user with the id
@@ -57,8 +101,21 @@ export class UsersService {
     //  `User with the ${id} deleted!`;
   };
 
+  // encrypting user's password
+  async signIn(email: string, hashedPassword): Promise <any> {
+    const user = await this.usersRepository.findOne( { where: {email} });
+
+    if (user?.password !== hashedPassword) {
+      throw new UnauthorizedException();
+    }
+
+    const { password, ...result } = user;
+  };
+
   // find a user with the email for  authentication
   async findByEmail(email: string): Promise<User | undefined> {
     return this.usersRepository.findOne({ where: {email}})
   }
+
+
 };
